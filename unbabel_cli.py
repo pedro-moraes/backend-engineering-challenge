@@ -1,13 +1,20 @@
+"""
+
+"""
+
 from typing import NamedTuple, Deque, TextIO
 from json import loads
 from math import floor
 from datetime import datetime
 from collections import deque
 
+
 class Event(NamedTuple):
+    """ """
+
     epoch_minute: int
     duration: int
-    
+
     @classmethod
     def from_input_line(cls, input_line: str):
         """
@@ -17,17 +24,19 @@ class Event(NamedTuple):
             input_line: The event string read from the file
 
         Returns:
-            Event instance 
+            Event instance
         """
         event_json = loads(input_line)
-        event = cls(floor(int(datetime.fromisoformat(event_json["timestamp"]).timestamp())/60),
-                     event_json["duration"])
-        
-        print(f"CREATING event: {event}")
-
-        return event
+        return cls(
+            floor(
+                int(datetime.fromisoformat(event_json["timestamp"]).timestamp()) / 60
+            ),
+            event_json["duration"],
+        )
 
 class Window:
+    """ """
+
     def __init__(self, size: int, initial_epoch_minute: int):
         """
         Initializes a new sliding window
@@ -57,38 +66,24 @@ class Window:
         """
         self.__start += 1
 
-        print(f"START: {self.__start}")
-        
-        counter = 0
-        for event in self.__events:
-            #count the number of events to be removed
-            if event.epoch_minute < self.__start:
-                counter += 1
+        for event_copy in self.__events.copy():
+            if event_copy.epoch_minute < self.__start:
+                self.__agg_duration -= self.__events.popleft().duration
             else:
                 break
 
-        for _ in range(counter):
-            """
-            since the deque is ordered by event epoch_minute we just need to remove the "counter"
-            first elements from the head of the queue
-            """
-            event = self.__events.popleft()
-            self.__agg_duration -= event.duration
-
-        print(f"START: {self.__events}")
-    
     def is_event_outside_window(self, event: Event):
         """
         Determines if an event is outside the window
 
         Args:
             event: The event read from the input file
-        
+
         Returns:
             bool
         """
         return event.epoch_minute > self.__start + self.__size - 1
-    
+
     def __calculate_average_delivery_time(self):
         """
         Calculates the average delivery time for the window events
@@ -104,38 +99,31 @@ class Window:
     def __str__(self):
         return (
             f"{{\"date\":\"{datetime.fromtimestamp((self.__start + self.__size)*60).strftime('%Y-%m-%d %H:%M:%S')}\", "
-            f"\"average_delivery_time\":{self.__calculate_average_delivery_time()}}}"
+            f'"average_delivery_time":{self.__calculate_average_delivery_time()}}}'
         )
-    
-def write_to_output_with_new_line(output: TextIO, window: Window):
-    output.write(str(window))
-    output.write("\n")
-        
+
 def main():
-    """
+    """ 
     """
     size = 10
 
-    with open("events.json", "r", encoding="utf-8") as input:
-        with open("output.json", "w", encoding="utf-8") as output:
-            initial_event = Event.from_input_line(input.readline())
+    with open("events.json", "r", encoding="utf-8") as input_file:
+        with open("output.json", "w", encoding="utf-8") as output_file:
+            window = None
 
-            window = Window(size, initial_event.epoch_minute)
-            write_to_output_with_new_line(output, window)
-            window.slide()
-            window.add_event(initial_event)
-
-            for line in input:
+            for line in input_file:
                 event = Event.from_input_line(line)
 
+                if window is None:
+                    window = Window(size, event.epoch_minute)
+
                 while window.is_event_outside_window(event):
-                    write_to_output_with_new_line(output, window)
+                    output_file.write(f"{str(window)}\n")
                     window.slide()
 
                 window.add_event(event)
-                
             else:
-                output.write(str(window))
+                output_file.write(str(window))
 
 if __name__ == "__main__":
     main()
