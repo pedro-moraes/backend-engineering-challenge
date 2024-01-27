@@ -110,7 +110,6 @@ def main():
     with open("events.json", "r", encoding="utf-8") as input_file:
         with open("output.json", "w", encoding="utf-8") as output_file:
             window = None
-
             for line in input_file:
                 event = Event.from_input_line(line)
 

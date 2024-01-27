@@ -2,7 +2,7 @@
 
 - [x] Fork github  
 - [x] Design solution
-- [ ] Implement solution
+- [x] Implement solution
 - [ ] Create pytests
 - [ ] Create CLI
 - [ ] Create readme
