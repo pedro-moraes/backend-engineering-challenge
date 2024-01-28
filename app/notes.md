@@ -7,4 +7,4 @@
 - [ ] Design tests
 - [x] Create args for CLI
 - [x] Create CLI executable
-- [ ] Create readme
+- [x] Create readme
