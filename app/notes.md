@@ -3,6 +3,8 @@
 - [x] Fork github  
 - [x] Design solution
 - [x] Implement solution
-- [ ] Create pytests
-- [ ] Create CLI
+- [x] Create pytests
+- [ ] Design tests
+- [x] Create args for CLI
+- [x] Create CLI executable
 - [ ] Create readme
