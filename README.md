@@ -1,7 +1,7 @@
 # Setup the application
 Tested with Python 3.11.7
 ```
-pip install -r requirements
+pip install -r requirements.txt
 pip install -e .
 ```
 
