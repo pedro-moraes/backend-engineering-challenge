@@ -6,13 +6,11 @@ pip install -e .
 ```
 
 # Run the application
-
 ```
 unbabel_cli --input_file "events.json" --window_size 10
 ```
 
 # Run tests
-
 In the project root folder run:
 ```
 pytest .

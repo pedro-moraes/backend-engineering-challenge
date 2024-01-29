@@ -18,6 +18,16 @@ config_data = {
         "window_size": 0,
         "output_file": "output_events_test3.json"
     },
+    "test_case_events_test4": {
+        "input_file": "events_test3.json",
+        "window_size": 5,
+        "output_file": "output_events_test4.json"
+    },
+    "test_case_events_test5": {
+        "input_file": "events_test5.json",
+        "window_size": 4,
+        "output_file": "output_events_test5.json"
+    },
 }
 
 @pytest.mark.parametrize("test_case, input_file, window_size, output_file", [

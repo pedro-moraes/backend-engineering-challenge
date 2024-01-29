@@ -1,6 +1,5 @@
-#!/usr/bin/env python3
 """
-
+Unbabel CLI tool to calculate SMA of the translation delivery time for the last X minutes
 """
 
 from typing import NamedTuple, Deque, TextIO
@@ -8,14 +7,16 @@ from json import loads
 from math import floor
 from datetime import datetime
 from collections import deque
-import argparse
+from argparse import ArgumentParser, ArgumentTypeError
 
 
 OUTPUT_FILENAME = "output.json"
 
 
 class Event(NamedTuple):
-    """ """
+    """
+    Class that stores information related to the translation events
+    """
 
     epoch_minute: int
     duration: int
@@ -41,7 +42,9 @@ class Event(NamedTuple):
 
 
 class Window:
-    """ """
+    """
+    Class that implements the SMA window
+    """
 
     def __init__(self, window_size: int, initial_epoch_minute: int):
         """
@@ -105,16 +108,29 @@ class Window:
 
         return self.__agg_duration / len(self.__events)
 
+    def __window_right_limit_to_timestamp(self):
+        """
+        Transforms the right limit epoch_minute of the window to a datetime
+
+        Returns:
+            Datetime
+        """
+        return (
+            datetime
+            .fromtimestamp((self.__start + self.__window_size) * 60)
+            .strftime('%Y-%m-%d %H:%M:%S')    
+        )
+
     def __str__(self):
         return (
-            f"{{\"date\":\"{datetime.fromtimestamp((self.__start + self.__window_size)*60).strftime('%Y-%m-%d %H:%M:%S')}\", "
+            f"{{\"date\":\"{self.__window_right_limit_to_timestamp()}\", "
             f'"average_delivery_time":{self.__calculate_average_delivery_time()}}}'
         )
 
 
 def sma_orchestrator(input_io: TextIO, window_size: int, output_io: TextIO):
-    """ 
-    
+    """
+    Reads the event file line by line and prints the aggregated output
     """
     window: Window = None
     for line in input_io:
@@ -134,20 +150,17 @@ def sma_orchestrator(input_io: TextIO, window_size: int, output_io: TextIO):
 
 
 def non_negative_int(value: str):
-    """
-
-    """
-    ivalue = int(value)
+    ivalue: int = int(value)
     if ivalue < 0:
-        raise argparse.ArgumentTypeError(f"{value} is not a non negative integer")
+        raise ArgumentTypeError(f"{value} is not a non negative integer")
     return ivalue
 
 
 def main():
-    """ 
+    """
     Module main function that parses the CLI arguments and calls the SMA orchestrator
     """
-    parser = argparse.ArgumentParser(
+    parser = ArgumentParser(
         prog="Backend Engineering Challenge",
         description="Calculates the SMA of the translation delivery time for the last X minutes",
     )
